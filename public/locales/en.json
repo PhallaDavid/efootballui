@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "home": "HOME",
+    "store": "STORE",
+    "about": "ABOUT US",
+    "profile": "Profile",
+    "logout": "Log out"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
+  },
+  "category": {
+    "title": "Game",
+    "description": "Explore our collection of games",
+    "seeAll": "See All"
+  },
+  "footer": {
+    "description": "Get the latest football gear and accessories for your gaming needs.",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "press": "Press",
+    "copyright": "© 2025 Phalla David. All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error"
+  }
+}

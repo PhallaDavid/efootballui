@@ -4,6 +4,7 @@ import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -56,7 +57,7 @@ function Carousel({
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
     },
-    plugins
+    [Autoplay({ delay: 5000 }), ...(plugins || [])]
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -287,7 +288,7 @@ function CarouselDots({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export {
-  type CarouselApi,
+  type CarouselApi, 
   Carousel,
   CarouselContent,
   CarouselItem,
