@@ -13,18 +13,23 @@ import {
   Trash2,
   BookOpen,
   Edit,
+  ArrowLeft,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import ProductCard from "@/components/ProductCard";
+import { EditPostDialog } from "@/components/EditPostDialog";
 import ImageUpload from "@/components/ImageUpload";
 import ImageEditor from "@/components/ImageEditor";
+import SettingsComponent from "@/components/Settings";
 
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +41,9 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
+  const [showContent, setShowContent] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -255,83 +263,135 @@ export default function ProfilePage() {
     }
   };
 
-  const handleEditPost = (post) => {
-    alert(`Edit post: ${post.title}`);
+  const handlePostUpdate = (updatedPost) => {
+    setPosts((prev) =>
+      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+    );
   };
 
-  const handleDeletePost = async (post) => {
-    if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
-      try {
-        const token = localStorage.getItem("access_token");
-        const response = await fetch(`http://127.0.0.1:8000/api/delete-product/${post.id}`, {
+  const openDeleteDialog = (post) => {
+    setPostToDelete(post);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleTabClick = (tabName) => {
+    setActiveTab(tabName);
+    // On mobile, show content when tab is clicked
+    if (window.innerWidth < 768) {
+      setShowContent(true);
+    }
+  };
+
+  const handleBackToTabs = () => {
+    setShowContent(false);
+  };
+
+  const confirmDeletePost = async () => {
+    if (!postToDelete) return;
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/products/${postToDelete.id}`,
+        {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
-
-        if (response.ok) {
-          setPosts((prev) => prev.filter((p) => p.id !== post.id));
-          alert("Post deleted successfully!");
-        } else {
-          alert("Failed to delete post.");
         }
-      } catch (error) {
-        console.error("Delete post error:", error);
-        alert("Failed to delete post.");
+      );
+
+      if (response.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== postToDelete.id));
+        setAlertMessage("Post deleted successfully!");
+        setAlertVariant("default");
+      } else {
+        setAlertMessage("Failed to delete post.");
+        setAlertVariant("destructive");
       }
+    } catch (error) {
+      console.error("Delete post error:", error);
+      setAlertMessage("Failed to delete post.");
+      setAlertVariant("destructive");
+    } finally {
+      setIsLoading(false);
+      setDeleteDialogOpen(false);
+      setPostToDelete(null);
     }
   };
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Profile & Settings - Left Side */}
-          <div className="md:col-span-1">
+          <div
+            className={`md:col-span-1 ${
+              showContent ? "hidden md:block" : "block"
+            }`}
+          >
             <div className="bg-card rounded-lg border p-4">
               <div className="space-y-2">
                 <button
-                  onClick={() => setActiveTab("profile")}
-                  className={`flex items-center space-x-3 w-full text-left px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors ${
+                  onClick={() => handleTabClick("profile")}
+                  className={`flex items-center cursor-pointer space-x-3 w-full text-left px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors ${
                     activeTab === "profile"
                       ? "bg-accent text-accent-foreground"
                       : ""
                   }`}
                 >
-                  <User className="w-5 h-5 text-primary" />
-                  <span className="text-lg font-semibold">Profile</span>
+                  <User className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium">Profile</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab("posts")}
-                  className={`flex items-center space-x-3 w-full text-left px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors ${
+                  onClick={() => handleTabClick("posts")}
+                  className={`flex items-center cursor-pointer space-x-3 w-full text-left px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors ${
                     activeTab === "posts"
                       ? "bg-accent text-accent-foreground"
                       : ""
-                  }`}
+                  }`} 
                 >
-                  <BookOpen className="w-5 h-5 text-primary" />
-                  <span className="text-lg font-semibold">Posts</span>
+                  <BookOpen className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium">Posts</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab("settings")}
-                  className={`flex items-center space-x-3 w-full text-left px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors ${
+                  onClick={() => handleTabClick("settings")}
+                  className={`flex items-center cursor-pointer space-x-3 w-full text-left px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors ${
                     activeTab === "settings"
                       ? "bg-accent text-accent-foreground"
                       : ""
                   }`}
                 >
-                  <Settings className="w-5 h-5 text-primary" />
-                  <span className="text-lg font-semibold">Settings</span>
+                  <Settings className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium">Settings</span>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Profile Info - Right Side */}
-          <div className="md:col-span-2">
+          <div
+            className={`md:col-span-3 ${
+              !showContent ? "hidden md:block" : "block"
+            }`}
+          >
             {activeTab === "profile" && (
               <div>
-                <h2 className="text-xl font-bold mb-6">Profile Information</h2>
+                {showContent && (
+                  <div className="mb-4 md:hidden">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBackToTabs}
+                      className="mb-4"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+                <h2 className="text-lg font-semibold mb-6">
+                  Profile Information
+                </h2>
                 {alertMessage && (
                   <Alert variant={alertVariant} className="mb-4">
                     {alertVariant === "default" ? (
@@ -403,7 +463,9 @@ export default function ProfilePage() {
                             size="sm"
                             className="rounded-full w-8 h-8 p-0"
                             onClick={() =>
-                              document.getElementById("avatar-file-input").click()
+                              document
+                                .getElementById("avatar-file-input")
+                                .click()
                             }
                           >
                             <Camera className="w-4 h-4" />
@@ -446,7 +508,9 @@ export default function ProfilePage() {
                     <div>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Full Name</label>
+                          <label className="text-sm font-medium">
+                            Full Name
+                          </label>
                           <Input
                             type="text"
                             value={formData.name}
@@ -555,9 +619,21 @@ export default function ProfilePage() {
             )}
             {activeTab === "posts" && (
               <div>
+                {showContent && (
+                  <div className="mb-4 md:hidden">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBackToTabs}
+                      className="mb-4"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold">My Posts</h2>
-                  <Button>Create New Post</Button>
+                  <h2 className="text-lg font-semibold">My Posts</h2>
+                  <Button variant="outline">Create New Post</Button>
                 </div>
                 {postsLoading ? (
                   <div className="flex justify-center py-8">
@@ -566,58 +642,54 @@ export default function ProfilePage() {
                 ) : posts.length === 0 ? (
                   <p className="text-muted-foreground">No posts found.</p>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Server</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created At</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {posts.map((post) => (
-                        <TableRow key={post.id}>
-                          <TableCell>{post.id}</TableCell>
-                          <TableCell>{post.title}</TableCell>
-                          <TableCell>{post.price}</TableCell>
-                          <TableCell>{post.server}</TableCell>
-                          <TableCell>{post.status}</TableCell>
-                          <TableCell>
-                            {new Date(post.created_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEditPost(post)}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeletePost(post)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {posts.map((post) => (
+                      <div key={post.id} className="relative">
+                        <ProductCard product={post} />
+                        <div className="absolute top-2 left-2 flex gap-2">
+                          <EditPostDialog
+                            product={post}
+                            onUpdate={handlePostUpdate}
+                          >
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/90 hover:bg-white"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </EditPostDialog>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="bg-white/90 hover:bg-white"
+                            onClick={() => openDeleteDialog(post)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
             {activeTab === "settings" && (
               <div>
-                <h2 className="text-xl font-bold mb-6">Settings</h2>
-                <p className="text-muted-foreground">Settings options will be displayed here.</p>
+                {showContent && (
+                  <div className="mb-4 md:hidden">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBackToTabs}
+                      className="mb-4"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+                <h2 className="text-lg font-semibold mb-6">Settings</h2>
+                <SettingsComponent />
               </div>
             )}
           </div>
@@ -633,6 +705,41 @@ export default function ProfilePage() {
           onSave={handleImageEdit}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Post</DialogTitle>
+            <DialogDescription>
+              {`Are you sure you want to delete "${postToDelete?.title}"? This action cannot be undone.`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeletePost}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

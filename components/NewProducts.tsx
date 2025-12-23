@@ -43,7 +43,7 @@ export default function NewProducts() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/new-products?page=1&row_per_page=4")
+    fetch("http://127.0.0.1:8000/api/new-products?page=1&row_per_page=9")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);

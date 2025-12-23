@@ -35,7 +35,7 @@ interface Product {
   created_at: string;
   updated_at: string;
   user_id: number;
-  user: User;
+  user: User | null;
 }
 
 interface ProductCardProps {
@@ -81,15 +81,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 flex-1">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={product.user.avatar} alt={product.user.name} />
+              <AvatarImage src={product.user?.avatar} alt={product.user?.name} />
               <AvatarFallback>
-                {product.user.name.charAt(0).toUpperCase()}
+                {product.user?.name?.charAt(0).toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="text-sm font-medium">{product.user.name}</p>
+              <p className="text-sm font-medium">{product.user?.name || 'Unknown User'}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {product.user.country}
+                {new Date(product.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
               </p>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <CardFooter className="pt-0 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-600 dark:text-gray-400">Chat to:</span>
-          {product.user.facebook_link && (
+          {product.user?.facebook_link && (
             <a
               href={product.user.facebook_link}
               target="_blank"
@@ -124,7 +124,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               <Facebook className="h-5 w-5 text-blue-600" />
             </a>
           )}
-          {product.user.telegram_link && (
+          {product.user?.telegram_link && (
             <a
               href={product.user.telegram_link}
               target="_blank"

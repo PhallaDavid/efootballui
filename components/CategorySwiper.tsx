@@ -98,7 +98,7 @@ export default function CategorySwiper() {
       key={category.id}
       className="pl-2 md:pl-4 basis-1/3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
     >
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center p-3">
+      <div className=" rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center p-3">
         
         {/* Image wrapper */}
         <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden">
