@@ -148,21 +148,23 @@ export default function Header() {
               </NavigationMenu>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {isLoggedIn ? (
-                <CreatePostDialog>
-                  <Button variant="outline" size="sm">
+              <div className="hidden md:flex">
+                {isLoggedIn ? (
+                  <CreatePostDialog>
+                    <Button variant="outline" size="sm">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </CreatePostDialog>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAuthModal("signin")}
+                  >
                     <Plus className="h-4 w-4" />
                   </Button>
-                </CreatePostDialog>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openAuthModal("signin")}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              )}
+                )}
+              </div>
               <LanguageSwitcher />
               <ThemeToggle />
               {isLoggedIn ? (
@@ -183,7 +185,7 @@ export default function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="flex items-center">
                         <User className=" h-4 w-4" />
-                        Profile
+                        {t('nav.profile')}
                       </Link>
                     </DropdownMenuItem>
 
@@ -192,7 +194,7 @@ export default function Header() {
                       className="flex items-center"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Log out
+                      {t('nav.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -203,16 +205,16 @@ export default function Header() {
                     size="sm"
                     onClick={() => openAuthModal("signin")}
                   >
-                    Sign In
+                    {t('auth.signIn')}
                   </Button>
-                  <Button size="sm" onClick={() => openAuthModal("signup")}>
-                    Sign Up
+                  <Button variant="outline" size="sm" onClick={() => openAuthModal("signup")}>
+                    {t('auth.signUp')}
                   </Button>
                 </div>
               )}
               <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="md:hidden">
+                  <Button variant="outline" size="sm" className="md:hidden">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
@@ -228,19 +230,19 @@ export default function Header() {
                       href="/"
                       className="text-lg font-medium hover:text-primary"
                     >
-                      HOME
+                      {t('nav.home')}
                     </Link>
                     <Link
                       href="/store"
                       className="text-lg font-medium hover:text-primary"
                     >
-                      STORE
+                      {t('nav.store')}
                     </Link>
                     <Link
                       href="/about"
                       className="text-lg font-medium hover:text-primary"
                     >
-                      ABOUT US
+                      {t('nav.about')}
                     </Link>
                     <div className="border-t pt-4">
                       {isLoggedIn ? (
@@ -250,7 +252,7 @@ export default function Header() {
                             className="flex items-center text-lg font-medium hover:text-primary"
                           >
                             <User className=" h-4 w-4" />
-                            Profile
+                            {t('nav.profile')}
                           </Link>
                           <Button
                             variant="ghost"
@@ -258,7 +260,7 @@ export default function Header() {
                             className="w-full hover:bg-accent justify-start text-lg font-medium"
                           >
                             <LogOut className="mr-2  h-4 w-4" />
-                            Log out
+                            {t('nav.logout')}
                           </Button>
                         </div>
                       ) : (
@@ -268,13 +270,14 @@ export default function Header() {
                             onClick={() => openAuthModal("signin")}
                             className="w-full"
                           >
-                            Sign In
+                            {t('auth.signIn')}
                           </Button>
                           <Button
+                            variant="outline"
                             onClick={() => openAuthModal("signup")}
                             className="w-full"
                           >
-                            Sign Up
+                            {t('auth.signUp')}
                           </Button>
                         </div>
                       )}

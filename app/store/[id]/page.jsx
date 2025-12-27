@@ -1,0 +1,211 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import StoreCategory from "@/components/StoreCategory";
+import ProductCard from "@/components/ProductCard";
+import { useCategories } from "@/lib/CategoryContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+interface Product {
+  id: number;
+  title: string;
+  price: string;
+  images: string[];
+  category_id: number;
+  server: string;
+  status: string;
+  login_with: string | null;
+  created_at: string;
+  updated_at: string;
+  user_id: number;
+  user: any;
+}
+
+export default function Store() {
+  const params = useParams();
+  const router = useRouter();
+  const categoryId = Number(params.id);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const { categories } = useCategories();
+
+  const itemsPerPage = 9;
+
+  useEffect(() => {
+    fetchProducts(categoryId, currentPage);
+  }, [categoryId, currentPage]);
+
+  const fetchProducts = async (catId: number, page: number) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/product-by-category/${catId}?page=${page}&row_per_page=${itemsPerPage}`
+      );
+      const data = await response.json();
+
+      if (data.products && data.products.data) {
+        setProducts(data.products.data);
+        setTotalPages(Math.ceil(data.products.total / itemsPerPage));
+      } else {
+        setProducts([]);
+        setTotalPages(1);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
+    }
+    setLoading(false);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    const newCategoryId = Number(value);
+    router.push(`/store/${newCategoryId}`);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pages.push(
+        <PaginationItem key={1}>
+          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        pages.push(
+          <PaginationItem key="start-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => handlePageChange(i)}
+            isActive={currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          <PaginationItem key="end-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      pages.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink onClick={() => handlePageChange(totalPages)}>
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <main className="flex w-full max-w-7xl flex-col items-center justify-between p-4 sm:items-start">
+        <StoreCategory activeCategoryId={categoryId} />
+
+        <div className="w-full mt-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold">Products</h2>
+            <Select value={categoryId.toString()} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(9)].map((_, index) => (
+                <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 animate-pulse">
+                  <div className="h-48 bg-gray-300 dark:bg-gray-700 rounded-lg mb-4"></div>
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-8">
+                  <Pagination>
+                    <PaginationContent>
+                      {currentPage > 1 && (
+                        <PaginationItem>
+                          <PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
+                        </PaginationItem>
+                      )}
+                      {renderPagination()}
+                      {currentPage < totalPages && (
+                        <PaginationItem>
+                          <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
+                        </PaginationItem>
+                      )}
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}

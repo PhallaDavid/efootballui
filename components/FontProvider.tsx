@@ -12,17 +12,18 @@ export function FontProvider({ children }: FontProviderProps) {
 
   useEffect(() => {
     const body = document.body;
+    // Remove both classes first
+    body.classList.remove('lang-english', 'lang-khmer');
+
     if (currentLanguage === 'kh') {
-      body.classList.remove('lang-english');
       body.classList.add('lang-khmer');
     } else {
-      body.classList.remove('lang-khmer');
       body.classList.add('lang-english');
     }
   }, [currentLanguage]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen font-sans">
       {children}
     </div>
   );

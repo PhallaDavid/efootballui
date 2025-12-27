@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/LanguageContext";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Key, Trash2, Loader2, CheckCircle, XCircle } from "lucide-react";
 
 export default function Settings() {
+  const { t } = useTranslation();
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +37,7 @@ export default function Settings() {
 
   const handleUpdatePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setAlertMessage("New passwords do not match.");
+      setAlertMessage(t("settings.passwordsNotMatch"));
       setAlertVariant("destructive");
       return;
     }
@@ -60,7 +62,7 @@ export default function Settings() {
       const data = await response.json();
 
       if (response.ok) {
-        setAlertMessage("Password updated successfully!");
+        setAlertMessage(t("settings.passwordUpdated"));
         setAlertVariant("default");
         setIsPasswordDialogOpen(false);
         setPasswordData({
@@ -69,12 +71,12 @@ export default function Settings() {
           confirmPassword: "",
         });
       } else {
-        setAlertMessage(data.message || "Failed to update password. Please try again.");
+        setAlertMessage(data.message || t("settings.failedToUpdatePassword"));
         setAlertVariant("destructive");
       }
     } catch (error) {
       console.error("Update password error:", error);
-      setAlertMessage("Failed to update password. Please check your connection and try again.");
+      setAlertMessage(t("settings.failedToUpdatePasswordConnection"));
       setAlertVariant("destructive");
     } finally {
       setIsLoading(false);
@@ -97,7 +99,7 @@ export default function Settings() {
       const data = await response.json();
 
       if (response.ok) {
-        setAlertMessage("Account deleted successfully!");
+        setAlertMessage(t("settings.accountDeleted"));
         setAlertVariant("default");
         // Redirect to home page or logout
         setTimeout(() => {
@@ -105,12 +107,12 @@ export default function Settings() {
           window.location.href = "/";
         }, 2000);
       } else {
-        setAlertMessage(data.message || "Failed to delete account. Please try again.");
+        setAlertMessage(data.message || t("settings.failedToDeleteAccount"));
         setAlertVariant("destructive");
       }
     } catch (error) {
       console.error("Delete account error:", error);
-      setAlertMessage("Failed to delete account. Please check your connection and try again.");
+      setAlertMessage(t("settings.failedToDeleteAccountConnection"));
       setAlertVariant("destructive");
     } finally {
       setIsLoading(false);
@@ -136,52 +138,52 @@ export default function Settings() {
           <div className="flex items-center space-x-3">
             <Key className="w-5 h-5 text-primary" />
             <div>
-              <p className="font-medium">Update Password</p>
+              <p className="font-medium">{t("settings.updatePassword")}</p>
               <p className="text-sm text-muted-foreground">
-                Change your account password
+                {t("settings.changeAccountPassword")}
               </p>
             </div>
           </div>
           <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">Update</Button>
+              <Button variant="outline">{t("settings.update")}</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Update Password</DialogTitle>
+                <DialogTitle>{t("settings.updatePasswordTitle")}</DialogTitle>
                 <DialogDescription>
-                  Enter your current password and choose a new one.
+                  {t("settings.updatePasswordDescription")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
+                  <Label htmlFor="current-password">{t("settings.currentPassword")}</Label>
                   <Input
                     id="current-password"
                     type="password"
                     value={passwordData.currentPassword}
                     onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
-                    placeholder="Enter current password"
+                    placeholder={t("settings.enterCurrentPassword")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
+                  <Label htmlFor="new-password">{t("settings.newPassword")}</Label>
                   <Input
                     id="new-password"
                     type="password"
                     value={passwordData.newPassword}
                     onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
-                    placeholder="Enter new password"
+                    placeholder={t("settings.enterNewPassword")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Label htmlFor="confirm-password">{t("settings.confirmNewPassword")}</Label>
                   <Input
                     id="confirm-password"
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
-                    placeholder="Confirm new password"
+                    placeholder={t("settings.confirmNewPasswordPlaceholder")}
                   />
                 </div>
               </div>
@@ -191,7 +193,7 @@ export default function Settings() {
                   onClick={() => setIsPasswordDialogOpen(false)}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t("auth.cancel")}
                 </Button>
                 <Button
                   onClick={handleUpdatePassword}
@@ -200,10 +202,10 @@ export default function Settings() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Updating...
+                      {t("settings.updatingPassword")}
                     </>
                   ) : (
-                    "Update Password"
+                    t("settings.updatePasswordButton")
                   )}
                 </Button>
               </DialogFooter>
@@ -216,21 +218,21 @@ export default function Settings() {
           <div className="flex items-center space-x-3">
             <Trash2 className="w-5 h-5 text-destructive" />
             <div>
-              <p className="font-medium text-destructive">Delete Account</p>
+              <p className="font-medium text-destructive">{t("settings.deleteAccount")}</p>
               <p className="text-sm text-muted-foreground">
-                Permanently delete your account and all associated data
+                {t("settings.deleteAccountDescription")}
               </p>
             </div>
           </div>
           <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="destructive">Delete</Button>
+              <Button variant="destructive">{t("settings.delete")}</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Delete Account</DialogTitle>
+                <DialogTitle>{t("settings.deleteAccountTitle")}</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to delete your account? This action cannot be undone and will permanently remove all your data.
+                  {t("settings.deleteAccountConfirm")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -239,7 +241,7 @@ export default function Settings() {
                   onClick={() => setIsDeleteDialogOpen(false)}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t("auth.cancel")}
                 </Button>
                 <Button
                   variant="destructive"
@@ -249,10 +251,10 @@ export default function Settings() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Deleting...
+                      {t("settings.deleting")}
                     </>
                   ) : (
-                    "Delete Account"
+                    t("settings.deleteAccountButton")
                   )}
                 </Button>
               </DialogFooter>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/LanguageContext";
 import {
   User,
   Settings,
@@ -32,6 +33,7 @@ import ImageEditor from "@/components/ImageEditor";
 import SettingsComponent from "@/components/Settings";
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertVariant, setAlertVariant] = useState("default");
@@ -88,12 +90,12 @@ export default function ProfilePage() {
           avatar: data.avatar || "",
         });
       } else {
-        setAlertMessage("Failed to load profile data.");
+        setAlertMessage(t("profile.failedToLoadProfile"));
         setAlertVariant("destructive");
       }
     } catch (error) {
       console.error("Fetch profile error:", error);
-      setAlertMessage("Failed to load profile data.");
+      setAlertMessage(t("profile.failedToLoadProfile"));
       setAlertVariant("destructive");
     }
   };
@@ -341,7 +343,7 @@ export default function ProfilePage() {
                   }`}
                 >
                   <User className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">Profile</span>
+                  <span className="text-sm font-medium">{t("profile.profile")}</span>
                 </button>
                 <button
                   onClick={() => handleTabClick("posts")}
@@ -349,10 +351,10 @@ export default function ProfilePage() {
                     activeTab === "posts"
                       ? "bg-accent text-accent-foreground"
                       : ""
-                  }`} 
+                  }`}
                 >
                   <BookOpen className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">Posts</span>
+                  <span className="text-sm font-medium">{t("profile.posts")}</span>
                 </button>
                 <button
                   onClick={() => handleTabClick("settings")}
@@ -363,7 +365,7 @@ export default function ProfilePage() {
                   }`}
                 >
                   <Settings className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">Settings</span>
+                  <span className="text-sm font-medium">{t("profile.settings")}</span>
                 </button>
               </div>
             </div>
@@ -390,7 +392,7 @@ export default function ProfilePage() {
                   </div>
                 )}
                 <h2 className="text-lg font-semibold mb-6">
-                  Profile Information
+                  {t("profile.profileInformation")}
                 </h2>
                 {alertMessage && (
                   <Alert variant={alertVariant} className="mb-4">
@@ -485,10 +487,10 @@ export default function ProfilePage() {
                               {isLoading ? (
                                 <>
                                   <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                                  Saving...
+                                  {t("profile.savingAvatar")}
                                 </>
                               ) : (
-                                "Save Avatar"
+                                t("profile.saveAvatar")
                               )}
                             </Button>
                             <Button
@@ -496,7 +498,7 @@ export default function ProfilePage() {
                               variant="outline"
                               onClick={() => setEditedImage(null)}
                             >
-                              Cancel
+                              {t("auth.cancel")}
                             </Button>
                           </div>
                         )}
@@ -509,7 +511,7 @@ export default function ProfilePage() {
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            Full Name
+                            {t("profile.fullName")}
                           </label>
                           <Input
                             type="text"
@@ -517,29 +519,29 @@ export default function ProfilePage() {
                             onChange={(e) =>
                               handleInputChange("name", e.target.value)
                             }
-                            placeholder="Enter your full name"
+                            placeholder={t("profile.enterFullName")}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Email</label>
+                          <label className="text-sm font-medium">{t("auth.email")}</label>
                           <Input
                             type="email"
                             value={formData.email}
                             onChange={(e) =>
                               handleInputChange("email", e.target.value)
                             }
-                            placeholder="Enter your email address"
+                            placeholder={t("profile.enterEmailAddress")}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Phone</label>
+                          <label className="text-sm font-medium">{t("profile.phone")}</label>
                           <Input
                             type="tel"
                             value={formData.phone_number}
                             onChange={(e) =>
                               handleInputChange("phone_number", e.target.value)
                             }
-                            placeholder="+1 (555) 123-4567"
+                            placeholder={t("profile.phonePlaceholder")}
                           />
                         </div>
                       </div>
@@ -548,19 +550,19 @@ export default function ProfilePage() {
                     <div>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Country</label>
+                          <label className="text-sm font-medium">{t("profile.country")}</label>
                           <Input
                             type="text"
                             value={formData.country}
                             onChange={(e) =>
                               handleInputChange("country", e.target.value)
                             }
-                            placeholder="Enter your country"
+                            placeholder={t("profile.enterCountry")}
                           />
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            Facebook Link
+                            {t("profile.facebookLink")}
                           </label>
                           <Input
                             type="url"
@@ -568,12 +570,12 @@ export default function ProfilePage() {
                             onChange={(e) =>
                               handleInputChange("facebook_link", e.target.value)
                             }
-                            placeholder="https://www.facebook.com/yourusername"
+                            placeholder={t("profile.facebookPlaceholder")}
                           />
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            Telegram Link
+                            {t("profile.telegramLink")}
                           </label>
                           <Input
                             type="url"
@@ -581,20 +583,20 @@ export default function ProfilePage() {
                             onChange={(e) =>
                               handleInputChange("telegram_link", e.target.value)
                             }
-                            placeholder="https://t.me/yourusername"
+                            placeholder={t("profile.telegramPlaceholder")}
                           />
                         </div>
                       </div>
                     </div>
                     <div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Bio</label>
+                        <label className="text-sm font-medium">{t("profile.bio")}</label>
                         <textarea
                           value={formData.bio}
                           onChange={(e) =>
                             handleInputChange("bio", e.target.value)
                           }
-                          placeholder="Tell us about yourself..."
+                          placeholder={t("profile.bioPlaceholder")}
                           rows={3}
                           className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                         />
@@ -607,10 +609,10 @@ export default function ProfilePage() {
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Updating...
+                          {t("profile.updating")}
                         </>
                       ) : (
-                        "Update"
+                        t("profile.update")
                       )}
                     </Button>
                   </div>
@@ -632,15 +634,15 @@ export default function ProfilePage() {
                   </div>
                 )}
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold">My Posts</h2>
-                  <Button variant="outline">Create New Post</Button>
+                  <h2 className="text-lg font-semibold">{t("profile.myPosts")}</h2>
+                  <Button variant="outline">{t("profile.createNewPost")}</Button>
                 </div>
                 {postsLoading ? (
                   <div className="flex justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : posts.length === 0 ? (
-                  <p className="text-muted-foreground">No posts found.</p>
+                  <p className="text-muted-foreground">{t("profile.noPostsFound")}</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {posts.map((post) => (
@@ -688,7 +690,7 @@ export default function ProfilePage() {
                     </Button>
                   </div>
                 )}
-                <h2 className="text-lg font-semibold mb-6">Settings</h2>
+                <h2 className="text-lg font-semibold mb-6">{t("profile.settings")}</h2>
                 <SettingsComponent />
               </div>
             )}
@@ -710,9 +712,9 @@ export default function ProfilePage() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Post</DialogTitle>
+            <DialogTitle>{t("profile.deletePost")}</DialogTitle>
             <DialogDescription>
-              {`Are you sure you want to delete "${postToDelete?.title}"? This action cannot be undone.`}
+              {t("profile.deletePostConfirm")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -721,7 +723,7 @@ export default function ProfilePage() {
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("auth.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -731,10 +733,10 @@ export default function ProfilePage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  {t("profile.deletingPost")}
                 </>
               ) : (
-                "Delete"
+                t("settings.delete")
               )}
             </Button>
           </DialogFooter>

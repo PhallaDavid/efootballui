@@ -1,27 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Hanuman } from "next/font/google";
+import { Hanuman, Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import { FontProvider } from "@/components/FontProvider";
+import { CategoryProvider } from "@/lib/CategoryContext";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-});
-
 const hanuman = Hanuman({
   variable: "--font-hanuman",
   subsets: ["khmer"],
   weight: ["400"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -37,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} ${hanuman.variable} antialiased lang-english`}
+        className={`${hanuman.variable} ${inter.variable} antialiased lang-english`}
       >
         <ThemeProvider
           attribute="class"
@@ -46,12 +43,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <LanguageProvider>
-            <FontProvider>
-              <Header />
-              {children}
-              <Footer />
-              <ScrollToTop />
-            </FontProvider>
+            <CategoryProvider>
+              <FontProvider>
+                <Header />
+                {children}
+                <Footer />
+                <ScrollToTop />
+              </FontProvider>
+            </CategoryProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

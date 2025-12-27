@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Autoplay from "embla-carousel-autoplay";
 import { useTranslation } from "@/lib/LanguageContext";
+import Link from "next/link";
 
 interface Category {
   id: number;
@@ -58,7 +59,7 @@ export default function CategorySwiper() {
               key={index}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
             >
-              <div className="relative h-40 w-full bg-gray-300 dark:bg-gray-700 animate-pulse"></div>
+              <div className="relative h-25 w-full bg-gray-300 dark:bg-gray-700 animate-pulse"></div>
             </div>
           ))}
         </div>
@@ -99,7 +100,7 @@ export default function CategorySwiper() {
       className="pl-2 md:pl-4 basis-1/3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
     >
       <div className=" rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center p-3">
-        
+        <Link href={`/store/${category.id}`} className="flex flex-col items-center">
         {/* Image wrapper */}
         <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden">
           <img
@@ -113,6 +114,7 @@ export default function CategorySwiper() {
         <p className="mt-3 text-sm font-medium text-gray-900 dark:text-white text-center truncate w-full">
           {category.name}
         </p>
+        </Link>
       </div>
     </CarouselItem>
   ))}

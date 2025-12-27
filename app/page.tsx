@@ -92,7 +92,7 @@ export default function Home() {
                 <CarouselItem key={banner.id}>
                   <div className="relative w-full h-48 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-lg">
                     <img
-                      src={`http://127.0.0.1:8000/storage/${banner.image}`}
+                      src={`${banner.image}`}
                       alt={banner.title}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -116,8 +116,7 @@ export default function Home() {
                     </div>
                   </div>
                 </CarouselItem>
-              ))
-            }
+              ))}
           </CarouselContent>
 
           {/* Carousel navigation */}

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle, XCircle, Eye, EyeOff } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslation } from "@/lib/LanguageContext";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export default function AuthModal({
   initialMode = "signin",
   onAuthSuccess,
 }: AuthModalProps) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<"signin" | "signup">(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -51,37 +53,37 @@ export default function AuthModal({
 
     // Email validation
     if (!formData.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = t("auth.emailRequired");
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = t("auth.invalidEmail");
       isValid = false;
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = t("auth.passwordRequired");
       isValid = false;
     } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = t("auth.passwordMinLength");
       isValid = false;
     }
 
     // Signup specific validations
     if (mode === "signup") {
       if (!formData.name) {
-        newErrors.name = "Name is required";
+        newErrors.name = t("auth.nameRequired");
         isValid = false;
       } else if (formData.name.length < 2) {
-        newErrors.name = "Name must be at least 2 characters";
+        newErrors.name = t("auth.nameMinLength");
         isValid = false;
       }
 
       if (!formData.confirmPassword) {
-        newErrors.confirmPassword = "Please confirm your password";
+        newErrors.confirmPassword = t("auth.confirmPasswordRequired");
         isValid = false;
       } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
+        newErrors.confirmPassword = t("auth.passwordsNotMatch");
         isValid = false;
       }
     }
@@ -117,17 +119,17 @@ export default function AuthModal({
 
         if (response.ok) {
           localStorage.setItem('access_token', data.access_token);
-          setAlertMessage('Sign in successful!');
+          setAlertMessage(t('auth.signInSuccess'));
           setAlertVariant('default');
           onAuthSuccess?.();
           setTimeout(() => onClose(), 3000);
         } else {
-          setAlertMessage(data.message || 'Sign in failed');
+          setAlertMessage(data.message || t('auth.signInFailed'));
           setAlertVariant('destructive');
         }
       } catch (error) {
         console.error('Sign in error:', error);
-        setAlertMessage('An error occurred during sign in');
+        setAlertMessage(t('auth.signInError'));
         setAlertVariant('destructive');
       }
     } else {
@@ -150,15 +152,15 @@ export default function AuthModal({
           // Registration successful, switch to sign in mode
           setMode("signin");
           resetForm();
-          setAlertMessage('User registered successfully! Please sign in.');
+          setAlertMessage(t('auth.registerSuccess'));
           setAlertVariant('default');
         } else {
-          setAlertMessage(data.message || 'Sign up failed');
+          setAlertMessage(data.message || t('auth.signUpFailed'));
           setAlertVariant('destructive');
         }
       } catch (error) {
         console.error('Sign up error:', error);
-        setAlertMessage('An error occurred during sign up');
+        setAlertMessage(t('auth.signUpError'));
         setAlertVariant('destructive');
       }
     }
@@ -191,11 +193,11 @@ export default function AuthModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px] ">
         <DialogHeader>
-          <DialogTitle>{mode === "signin" ? "Sign In" : "Sign Up"}</DialogTitle>
+          <DialogTitle>{mode === "signin" ? t("auth.signIn") : t("auth.signUp")}</DialogTitle>
           <DialogDescription>
             {mode === "signin"
-              ? "Wellcome back! Sign in to your account."
-              : "Create a new account to get started."}
+              ? t("auth.welcomeBack")
+              : t("auth.createAccount")}
           </DialogDescription>
         </DialogHeader>
         {alertMessage && (
@@ -227,7 +229,7 @@ export default function AuthModal({
             className="flex-1"
             disabled={isLoading}
           >
-            Sign In
+            {t("auth.signIn")}
           </Button>
           <Button
             variant={mode === "signup" ? "default" : "outline"}
@@ -244,17 +246,17 @@ export default function AuthModal({
             className="flex-1"
             disabled={isLoading}
           >
-            Sign Up
+            {t("auth.signUp")}
           </Button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("auth.name")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter your name"
+                placeholder={t("auth.enterName")}
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -265,11 +267,11 @@ export default function AuthModal({
             </div>
           )}
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("auth.enterEmail")}
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
@@ -279,12 +281,12 @@ export default function AuthModal({
             {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("auth.password")}</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder={t("auth.enterPassword")}
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
@@ -310,12 +312,12 @@ export default function AuthModal({
           </div>
           {mode === "signup" && (
             <div>
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t("auth.confirmPassword")}</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
+                  placeholder={t("auth.confirmYourPassword")}
                   value={formData.confirmPassword}
                   onChange={(e) =>
                     setFormData({ ...formData, confirmPassword: e.target.value })
@@ -347,18 +349,18 @@ export default function AuthModal({
               onClick={handleClose}
               disabled={isLoading}
             >
-              Cancel
+              {t("auth.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {mode === "signin" ? "Signing In..." : "Signing Up..."}
+                  {mode === "signin" ? t("auth.signingIn") : t("auth.signingUp")}
                 </>
               ) : mode === "signin" ? (
-                "Sign In"
+                t("auth.signIn")
               ) : (
-                "Sign Up"
+                t("auth.signUp")
               )}
             </Button>
           </div>

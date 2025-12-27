@@ -10,6 +10,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Facebook, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface User {
   id: number;
@@ -48,20 +56,56 @@ export default function ProductCard({ product }: ProductCardProps) {
       <CardHeader className="pb-4">
         {product.images && product.images.length > 0 ? (
           <div className="relative h-48 w-full rounded-lg overflow-hidden">
-            <img
-              src={product.images[0]}
-              alt={product.title}
-              className="w-full h-full object-cover"
-            />
-            <Badge className="absolute top-2 right-2 bg-white/90 text-gray-900 text-sm font-bold px-2 py-1 border shadow-sm">
+            {product.images.length === 1 ? (
+              <img
+                src={product.images[0]}
+                alt={product.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Carousel className="w-full h-full">
+                <CarouselContent>
+                  {product.images.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <img
+                        src={image}
+                        alt={`${product.title} - Image ${index + 1}`}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
+            )}
+            <Badge className="absolute top-2 left-2 text-xs z-10 bg-white/90 text-gray-900 border shadow-sm">
               ${product.price}
+            </Badge>
+            <Badge
+              className={`absolute top-2 right-2 text-xs z-10 border shadow-sm ${
+                product.status === "active"
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "bg-red-500 text-white hover:bg-red-600"
+              }`}
+            >
+              {product.status}
             </Badge>
           </div>
         ) : (
           <div className="relative h-48 w-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
             <span className="text-gray-500 dark:text-gray-400">No Image</span>
-            <Badge className="absolute top-2 right-2 bg-white/90 text-gray-900 text-sm font-bold px-2 py-1 border shadow-sm">
+            <Badge className="absolute top-2 left-2 text-xs bg-white/90 text-gray-900 border shadow-sm">
               ${product.price}
+            </Badge>
+            <Badge
+              className={`absolute top-2 right-2 text-xs border shadow-sm ${
+                product.status === "active"
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "bg-red-500 text-white hover:bg-red-600"
+              }`}
+            >
+              {product.status}
             </Badge>
           </div>
         )}
@@ -80,40 +124,44 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 flex-1">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={product.user?.avatar} alt={product.user?.name} />
-              <AvatarFallback>
-                {product.user?.name?.charAt(0).toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
+            <Link href={`/account/${product.user?.id}`}>
+              <Avatar className="h-8 cursor-pointer w-8">
+                <AvatarImage
+                  src={product.user?.avatar}
+                  alt={product.user?.name}
+                />
+                <AvatarFallback>
+                  {product.user?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
             <div className="flex-1">
-              <p className="text-sm font-medium">{product.user?.name || 'Unknown User'}</p>
+              <p className="text-sm font-medium">
+                {product.user?.name || "Unknown User"}
+              </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(product.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                {new Date(product.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                at{" "}
+                {new Date(product.created_at).toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
               </p>
             </div>
-          </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <Badge variant="secondary" className="text-xs">
-              {product.server}
-            </Badge>
-            <Badge
-              variant="secondary"
-              className={`text-xs ${
-                product.status === "active"
-                  ? "bg-green-500 text-white hover:bg-green-600"
-                  : "bg-red-500 text-white hover:bg-red-600"
-              }`}
-            >
-              {product.status}
-            </Badge>
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="pt-0 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Chat to:</span>
+          {/* <span className="text-sm text-gray-600 dark:text-gray-400">
+            Chat to:
+          </span> */}
           {product.user?.facebook_link && (
             <a
               href={product.user.facebook_link}
@@ -135,9 +183,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             </a>
           )}
         </div>
-        <Button variant="outline">
-          View Details
-        </Button>
+        <Link href={`/detail/${product.id}`}>
+        <Button variant="outline">View Details</Button>
+        </Link>
       </CardFooter>
     </Card>
   );

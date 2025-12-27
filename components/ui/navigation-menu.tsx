@@ -1,8 +1,8 @@
-import * as React from "react"
-import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
-import { Slot } from "@radix-ui/react-slot"
+import * as React from "react";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
+import { Slot } from "@radix-ui/react-slot";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function NavigationMenu({
   className,
@@ -20,7 +20,7 @@ function NavigationMenu({
     >
       {children}
     </NavigationMenuPrimitive.Root>
-  )
+  );
 }
 
 function NavigationMenuList({
@@ -36,7 +36,7 @@ function NavigationMenuList({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function NavigationMenuItem({
@@ -49,7 +49,7 @@ function NavigationMenuItem({
       className={cn("relative", className)}
       {...props}
     />
-  )
+  );
 }
 
 function NavigationMenuLink({
@@ -57,9 +57,22 @@ function NavigationMenuLink({
   asChild,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Link>) {
-  const Comp = asChild ? Slot : NavigationMenuPrimitive.Link
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="navigation-menu-link"
+        className={cn(
+          "inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1",
+          className
+        )}
+      >
+        {props.children}
+      </Slot>
+    );
+  }
+
   return (
-    <Comp
+    <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
         "inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1",
@@ -67,7 +80,7 @@ function NavigationMenuLink({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -75,4 +88,4 @@ export {
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
-}
+};
